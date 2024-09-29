@@ -21,6 +21,9 @@
     "url": "https://github.com/stianhoe/MMM-Nordpool/issues"
   },
   "homepage": "https://github.com/stianhoe/MMM-Nordpool#readme",
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  },
   "devDependencies": {
     "@eslint/js": "^9.10.0",
     "@stylistic/eslint-plugin": "^2.7.2",
