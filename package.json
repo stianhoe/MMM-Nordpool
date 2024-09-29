@@ -1,8 +1,8 @@
 {
-  "name": "mmm-template",
+  "name": "mmm-nordpool",
   "version": "1.0.0",
-  "description": "[Module description]",
-  "main": "MMM-Template.js",
+  "description": "Magic Mirror module to fetch the Nordpool electricity prices.",
+  "main": "MMM-Nordpool.js",
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -10,17 +10,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+[GitHub url].git"
+    "url": "git+https://github.com/stianhoe/MMM-Nordpool.git"
   },
   "keywords": [
     "template"
   ],
-  "author": "[Author]",
+  "author": "Stian Hoel",
   "license": "MIT",
   "bugs": {
-    "url": "[GitHub url]/issues"
+    "url": "https://github.com/stianhoe/MMM-Nordpool/issues"
   },
-  "homepage": "[GitHub url]#readme",
+  "homepage": "https://github.com/stianhoe/MMM-Nordpool#readme",
   "devDependencies": {
     "@eslint/js": "^9.10.0",
     "@stylistic/eslint-plugin": "^2.7.2",
