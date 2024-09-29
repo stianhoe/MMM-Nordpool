@@ -37,6 +37,9 @@ Module.register("MMM-Nordpool", {
     } else if (this.prices.length === 0) {
       wrapper.innerHTML = "<p>Ingen strømpriser tilgjengelig.</p>";
     } else {
+      // Legg til en debugging linje for å vise prisene i DOM
+      console.log("MMM-Nordpool: Priser mottatt i frontend:", this.prices);
+      wrapper.innerHTML += `<pre>${JSON.stringify(this.prices, null, 2)}</pre>`;
       this.renderGraph(canvas); // Vis ekte graf hvis data er tilgjengelig
     }
 
@@ -44,6 +47,7 @@ Module.register("MMM-Nordpool", {
   },
 
   updatePrices: function () {
+    console.log("MMM-Nordpool: Oppdaterer priser fra API...");
     this.sendSocketNotification("GET_NORDPOOL_PRICES", {
       apiUrl: this.config.apiUrl,
       region: this.config.region,
@@ -58,7 +62,7 @@ Module.register("MMM-Nordpool", {
       if (!Array.isArray(this.prices) || this.prices.length === 0) {
         console.error("MMM-Nordpool: Ingen priser mottatt, viser dummy-graf.");
       } else {
-        console.log("MMM-Nordpool: Prisdata mottatt:", this.prices);
+        console.log("MMM-Nordpool: Prisdata mottatt i frontend:", this.prices);
       }
       this.updateDom();
     }
