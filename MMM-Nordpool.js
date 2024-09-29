@@ -15,7 +15,7 @@ Module.register("MMM-NordPool", {
   },
 
   getStyles: function () {
-    return ["MMM-NordPool.css"];
+    return ["nordpool.css"];
   },
 
   getDom: function () {
