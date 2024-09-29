@@ -1,4 +1,4 @@
-Module.register("MMM-NordPool", {
+Module.register("MMM-Nordpool", {
   defaults: {
     apiUrl: "https://www.nordpoolgroup.com/api/marketdata/page/10?currency=,EUR,EUR,EUR",
     updateInterval: 60 * 60 * 1000, // Oppdatering hver time
@@ -16,11 +16,11 @@ Module.register("MMM-NordPool", {
   },
 
   getScripts: function () {
-    return ["modules/MMM-NordPool/node_modules/chart.js/dist/chart.min.js"];
+    return ["modules/MMM-Nordpool/node_modules/chart.js/dist/chart.min.js"];
   },
 
   getStyles: function () {
-    return ["MMM-NordPool.css"];
+    return ["nordpool.css"];
   },
 
   getDom: function () {
