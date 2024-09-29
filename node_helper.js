@@ -27,22 +27,30 @@ module.exports = NodeHelper.create({
         console.error("MMM-Nordpool: Ugyldig data mottatt fra API.");
         return { error: "Ugyldig data fra API-et" };
       }
-
+  
       const rows = data.data.Rows;
-      console.log("MMM-Nordpool: Antall rader mottatt fra API:", rows.length);
-
+      console.log("MMM-Nordpool: Rådata fra API-et (rows):", rows);
+  
       const prices = rows.map((row) => {
-        const time = row.StartTime.split("T")[1].split(":")[0];
+        console.log("MMM-Nordpool: Enkelt rad fra API-et:", row);
+  
+        const time = row.StartTime.split("T")[1].split(":")[0]; // Henter time-stempelet
+        console.log("MMM-Nordpool: Time-stempel for rad:", time);
+  
+        // Sjekk om 'Columns' inneholder regionen
         const priceObj = row.Columns.find((col) => col.Name === region);
+        console.log(`MMM-Nordpool: Prisobjekt for region ${region}:`, priceObj);
+  
         const price = priceObj ? parseFloat(priceObj.Value.replace(",", ".")) : null;
-
+        console.log(`MMM-Nordpool: Prisverdi for ${time}:00`, price);
+  
         return { hour: `${time}:00`, price: price ? price : "N/A" };
       }).filter((price) => price.price !== null);
-
+  
       return prices;
     } catch (e) {
       console.error("MMM-Nordpool: Feil ved prosessering av priser:", e);
       return { error: "Feil ved prosessering av data" };
     }
-  }
+  }  
 });
