@@ -25,8 +25,6 @@ Module.register("MMM-Nordpool", {
 
   getDom: function () {
     const wrapper = document.createElement("div");
-
-    // Opprett en canvas for Chart.js
     const canvas = document.createElement("canvas");
     canvas.id = "nordpoolChart";
     wrapper.appendChild(canvas);
@@ -34,6 +32,10 @@ Module.register("MMM-Nordpool", {
     if (!this.prices) {
       wrapper.innerHTML += "<p>Laster strømpriser...</p>";
       this.renderDummyGraph(canvas); // Vis dummy-graf hvis det ikke er priser
+    } else if (this.prices.error) {
+      wrapper.innerHTML = `<p>Feil: ${this.prices.error}</p>`;
+    } else if (this.prices.length === 0) {
+      wrapper.innerHTML = "<p>Ingen strømpriser tilgjengelig.</p>";
     } else {
       this.renderGraph(canvas); // Vis ekte graf hvis data er tilgjengelig
     }
@@ -50,14 +52,19 @@ Module.register("MMM-Nordpool", {
   },
 
   socketNotificationReceived: function (notification, payload) {
+    console.log("MMM-Nordpool: Mottatt socket-notifikasjon:", notification, payload);
     if (notification === "NORDPOOL_PRICES") {
       this.prices = payload;
+      if (!Array.isArray(this.prices) || this.prices.length === 0) {
+        console.error("MMM-Nordpool: Ingen priser mottatt, viser dummy-graf.");
+      } else {
+        console.log("MMM-Nordpool: Prisdata mottatt:", this.prices);
+      }
       this.updateDom();
     }
   },
 
   renderGraph: function (canvas) {
-    // Hvis en graf allerede finnes, ødelegger vi den for å lage en ny
     if (this.chart) {
       this.chart.destroy();
     }
@@ -65,7 +72,6 @@ Module.register("MMM-Nordpool", {
     const labels = this.prices.map(price => price.hour);
     const data = this.prices.map(price => price.price);
 
-    // Opprett en ny Chart.js-graf med ekte data
     this.chart = new Chart(canvas, {
       type: "line",
       data: {
@@ -91,16 +97,13 @@ Module.register("MMM-Nordpool", {
   },
 
   renderDummyGraph: function (canvas) {
-    // Dummy-data for fallback-graf
     const dummyLabels = ["00:00", "01:00", "02:00", "03:00", "04:00", "05:00", "06:00"];
     const dummyData = [45.0, 40.3, 42.8, 38.1, 36.7, 35.9, 34.5];
 
-    // Hvis en graf allerede finnes, ødelegger vi den for å lage en ny
     if (this.chart) {
       this.chart.destroy();
     }
 
-    // Opprett en Chart.js-graf med dummy-data
     this.chart = new Chart(canvas, {
       type: "bar",
       data: {
