@@ -7,8 +7,20 @@ module.exports = NodeHelper.create({
       const { apiUrl, region, currency } = payload;
       try {
         // Henter priser fra Nord Pool API
-        const response = await fetch(apiUrl);
-        const data = await response.json();
+        const response = await fetch(apiUrl).catch(error => {
+          console.error("Feil ved henting av Nord Pool API:", error);
+          this.sendSocketNotification("NORDPOOL_PRICES_ERROR", { error: "Feil ved henting av data" });
+          return;
+        });
+        
+        if (!response) return; // Sjekk om responsen er gyldig før vi fortsetter
+        
+        const data = await response.json().catch(error => {
+          console.error("Feil ved parsing av Nord Pool-data:", error);
+          this.sendSocketNotification("NORDPOOL_PRICES_ERROR", { error: "Feil ved parsing av data" });
+        });
+        
+        if (!data) return; // Sjekk om data er gyldig før vi fortsetter        
 
         // Henter ut priser for ønsket region og konverterer til ønsket valuta
         const prices = data.data.Rows.map((row) => {
