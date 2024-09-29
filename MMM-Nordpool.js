@@ -3,7 +3,7 @@ Module.register("MMM-Nordpool", {
     apiUrl: "https://www.nordpoolgroup.com/api/marketdata/page/10?currency=,EUR,EUR,EUR",
     updateInterval: 60 * 60 * 1000, // Oppdatering hver time
     displayCurrency: "NOK", // Endre til ønsket valuta
-    region: "NO1" // Sett ønsket område (eks. NO1, NO2, SE3, osv.)
+    region: "Tr.heim" // Velg ønsket region (eks. "Oslo", "Kr.sand", "Bergen", osv.)
   },
 
   start: function () {
