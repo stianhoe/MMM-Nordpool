@@ -18,3 +18,9 @@
     text-align: center;
   }
   
+  .nordpool-wrapper canvas {
+    width: 600px;
+    height: 400px;
+  }
+  
+  
