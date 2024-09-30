@@ -30,8 +30,9 @@ Module.register("MMM-Nordpool", {
     const wrapper = document.createElement("div");
     const canvas = document.createElement("canvas");
     canvas.id = "nordpoolChart";
-    wrapper.appendChild(canvas);
     wrapper.className = "nordpool-wrapper";
+    wrapper.appendChild(canvas);
+  
 
     if (!this.prices) {
       wrapper.innerHTML = "<p>Laster strømpriser...</p>";
