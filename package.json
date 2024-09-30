@@ -23,7 +23,8 @@
   "homepage": "https://github.com/stianhoe/MMM-Nordpool#readme",
   "dependencies": {
     "node-fetch": "^2.6.7",
-    "chart.js": "^4.0.1"
+    "chart.js": "^4.0.1",
+    "chartjs-plugin-datalabels": "^2.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.10.0",

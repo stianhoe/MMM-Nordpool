@@ -16,8 +16,11 @@ Module.register("MMM-Nordpool", {
   },
 
   getScripts: function () {
-    return ["modules/MMM-Nordpool/node_modules/chart.js/dist/chart.umd.js"];
-  },  
+    return [
+      "modules/MMM-Nordpool/node_modules/chart.js/dist/chart.umd.js",
+      "modules/MMM-Nordpool/node_modules/chartjs-plugin-datalabels/dist/chartjs-plugin-datalabels.min.js"
+    ];
+  },
 
   getStyles: function () {
     return ["nordpool.css"];
