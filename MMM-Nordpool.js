@@ -65,10 +65,10 @@ Module.register("MMM-Nordpool", {
     if (this.chart) {
       this.chart.destroy();
     }
-
+  
     const labels = this.prices.map(price => price.time); // Tidspunkter
-    const data = this.prices.map(price => price.price); // Priser
-
+    const data = this.prices.map(price => parseFloat(price.price)); // Priser som tall
+  
     this.chart = new Chart(canvas, {
       type: "bar",
       data: {
@@ -101,5 +101,5 @@ Module.register("MMM-Nordpool", {
         }
       }
     });
-  }
+  }  
 });

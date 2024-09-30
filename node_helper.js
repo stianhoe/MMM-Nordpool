@@ -20,12 +20,12 @@ module.exports = NodeHelper.create({
   processPrices(data) {
     try {
       return data.map((item) => ({
-        time: item.time_start.split("T")[1].substring(0, 5), // Henter kun time:minute
-        price: item.NOK_per_kWh.toFixed(4) // Formater pris
+        time: item.time_start.split("T")[1].substring(0, 5), // Henter time:minute fra "time_start"
+        price: item.NOK_per_kWh.toFixed(4) // Pris formatert til 4 desimaler
       }));
     } catch (e) {
       console.error("MMM-Nordpool: Feil ved prosessering av priser:", e);
       return { error: "Feil ved prosessering av data" };
     }
-  }
+  }  
 });
