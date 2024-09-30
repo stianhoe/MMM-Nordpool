@@ -106,10 +106,7 @@ Module.register("MMM-Nordpool", {
             enabled: true
           },
           datalabels: {
-            display: (context) => {
-              const hour = parseInt(labels[context.dataIndex].split(":")[0]);
-              return hour === currentHour; // Vis kun verdien for nåværende time
-            },
+            display: true,
             color: 'white',
             font: {
               weight: 'bold',
