@@ -19,8 +19,8 @@
   }
   
   .nordpool-wrapper {
-    width: 800px; /* Sett bredde på innpakningen */
-    height: 400px; /* Sett høyde på innpakningen */
+    width: 600; /* Sett bredde på innpakningen */
+    height: 200; /* Sett høyde på innpakningen */
   }
   
   #nordpoolChart {
