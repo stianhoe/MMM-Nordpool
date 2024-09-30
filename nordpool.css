@@ -18,9 +18,15 @@
     text-align: center;
   }
   
-  .nordpool-wrapper canvas {
-    width: 600px;
-    height: 400px;
+  .nordpool-wrapper {
+    width: 800px; /* Sett bredde på innpakningen */
+    height: 400px; /* Sett høyde på innpakningen */
   }
+  
+  #nordpoolChart {
+    width: 100% !important; /* Tilpass grafens bredde til wrapper */
+    height: 100% !important; /* Tilpass grafens høyde til wrapper */
+  }
+  
   
   
