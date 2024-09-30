@@ -17,8 +17,7 @@ Module.register("MMM-Nordpool", {
 
   getScripts: function () {
     return [
-      "modules/MMM-Nordpool/node_modules/chart.js/dist/chart.umd.js",
-      "modules/MMM-Nordpool/node_modules/chartjs-plugin-datalabels/dist/chartjs-plugin-datalabels.min.js"
+      "modules/MMM-Nordpool/node_modules/chart.js/dist/chart.umd.js"
     ];
   },
 
@@ -104,18 +103,6 @@ Module.register("MMM-Nordpool", {
           },
           tooltip: {
             enabled: true
-          },
-          datalabels: {
-            display: true,
-            color: 'white',
-            font: {
-              weight: 'bold',
-              size: 14
-            },
-            formatter: (value) => `${value.toFixed(2)} NOK`, // Formater verdien
-            anchor: 'end',
-            align: 'start',
-            offset: -5
           }
         },
         scales: {

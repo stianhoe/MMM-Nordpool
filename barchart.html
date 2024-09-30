@@ -3,66 +3,100 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Test Chart</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <title>ApexCharts Example</title>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 </head>
 <body>
   <div style="width: 50%; margin: auto;">
-    <canvas id="myChart"></canvas>
+    <div id="currentPrice" style="text-align: center; font-size: 24px; margin-bottom: 20px;"></div>
+    <div id="chart" style="max-width: 650px; margin: auto;"></div>
   </div>
 
   <script>
-    // Funksjon for å hente data fra API
     async function fetchData() {
       const response = await fetch("https://www.hvakosterstrommen.no/api/v1/prices/2024/09-30_NO3.json");
       const data = await response.json();
-      
-      // Hent tidspunkter og priser fra dataen
       const labels = data.map(item => item.time_start.split("T")[1].substring(0, 5));
-      const prices = data.map(item => item.NOK_per_kWh.toFixed(4));
-
+      const prices = data.map(item => parseFloat(item.NOK_per_kWh.toFixed(4)));
       return { labels, prices };
     }
 
-    // Initialiser grafen med hentede data
-    async function createChart() {
+    async function createApexChart() {
       const { labels, prices } = await fetchData();
+      const currentHour = new Date().getHours();
 
-      const ctx = document.getElementById("myChart").getContext("2d");
-      new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Strømpriser (NOK/kWh)',
-            data: prices,
-            backgroundColor: 'rgba(54, 162, 235, 0.5)',
-            borderColor: 'rgba(54, 162, 235, 1)',
-            borderWidth: 1
-          }]
+      // Definer farger basert på tid
+      const colors = labels.map((label, index) => {
+        const hour = parseInt(label.split(":")[0]);
+        if (hour < currentHour) return 'rgba(100, 100, 100, 0.5)'; // Svak grå for tidligere timer
+        if (hour === currentHour) return 'rgba(255, 99, 132, 0.8)'; // Rød for nåværende time
+        return 'rgba(54, 162, 235, 0.5)'; // Blå for fremtidige timer
+      });
+
+      // Finn nåværende pris og vis i tekstboks
+      const currentPrice = prices[currentHour] || "N/A";
+      document.getElementById("currentPrice").innerHTML = `Nåværende pris: ${currentPrice.toFixed(2)} NOK/kWh`;
+
+      var options = {
+        chart: {
+          type: 'bar',
+          height: 350,
+          toolbar: { show: false } // Fjern verktøylinjen
         },
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true,
-              title: {
-                display: true,
-                text: 'Pris (NOK/kWh)'
-              }
+        series: [{
+          name: 'Strømpris (NOK/kWh)',
+          data: prices
+        }],
+        xaxis: {
+          categories: labels,
+          labels: {
+            show: true // Vis tidspunkter for hver time
+          },
+          title: {
+            text: 'Tidspunkt',
+            style: { fontWeight: 'bold' }
+          }
+        },
+        yaxis: {
+          title: {
+            text: 'Pris (NOK/kWh)',
+            style: { fontWeight: 'bold' }
+          }
+        },
+        plotOptions: {
+          bar: {
+            distributed: false, // Ingen forskjellig farge for hver bar
+            colors: {
+              backgroundBarColors: colors,
+              backgroundBarOpacity: 1
             },
-            x: {
-              title: {
-                display: true,
-                text: 'Tidspunkt'
-              }
+            dataLabels: {
+              position: 'top'
             }
           }
+        },
+        fill: {
+          colors: colors // Bruk farger basert på tid
+        },
+        legend: {
+          show: false // Fjern legend
+        },
+        tooltip: {
+          y: {
+            formatter: function (val) {
+              return `${val.toFixed(2)} NOK`;
+            }
+          },
+          shared: true,
+          intersect: false
         }
-      });
+      };
+
+      var chart = new ApexCharts(document.querySelector("#chart"), options);
+      chart.render();
     }
 
-    // Kall funksjonen for å opprette grafen
-    createChart();
+    createApexChart();
   </script>
 </body>
 </html>
