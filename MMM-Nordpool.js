@@ -67,16 +67,18 @@ Module.register("MMM-Nordpool", {
     }
   
     const labels = this.prices.map(price => price.time); // Tidspunkter
-    const currentHour = new Date().getHours(); // Finn nåværende time
+    const currentHour = new Date().getHours(); // Nåværende time
     const data = this.prices.map(price => parseFloat(price.price)); // Priser som tall
     
-    // Fargeinnstillinger basert på nåværende time
+    // Definer bakgrunns- og borderfarger basert på nåværende time
     const backgroundColors = this.prices.map(price => {
       const hour = parseInt(price.time.split(":")[0]);
       if (hour < currentHour) return "rgba(100, 100, 100, 0.5)"; // Svakere farge for tidligere timer
       if (hour === currentHour) return "rgba(255, 99, 132, 0.8)"; // Fremhev nåværende time
       return "rgba(54, 162, 235, 0.5)"; // Normal farge for kommende timer
     });
+  
+    const borderColors = backgroundColors; // Border-fargen matcher bar-fargen
   
     this.chart = new Chart(canvas, {
       type: "bar",
@@ -86,7 +88,7 @@ Module.register("MMM-Nordpool", {
           {
             data: data,
             backgroundColor: backgroundColors,
-            borderColor: "rgba(54, 162, 235, 1)",
+            borderColor: borderColors,
             borderWidth: 1
           }
         ]
@@ -95,6 +97,20 @@ Module.register("MMM-Nordpool", {
         plugins: {
           legend: {
             display: false // Fjern legend
+          },
+          tooltip: {
+            enabled: true // Aktiver tooltips for å vise verdiene
+          },
+          datalabels: {
+            display: function (context) {
+              // Kun vis verdien over baren for nåværende time
+              return context.dataIndex === currentHour;
+            },
+            align: 'end',
+            anchor: 'end',
+            formatter: function (value) {
+              return value.toFixed(2); // Formater verdien
+            }
           }
         },
         scales: {
