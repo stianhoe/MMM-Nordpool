@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Chart</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div style="width: 50%; margin: auto;">
+    <canvas id="myChart"></canvas>
+  </div>
+
+  <script>
+    // Funksjon for å hente data fra API
+    async function fetchData() {
+      const response = await fetch("https://www.hvakosterstrommen.no/api/v1/prices/2024/09-30_NO3.json");
+      const data = await response.json();
+      
+      // Hent tidspunkter og priser fra dataen
+      const labels = data.map(item => item.time_start.split("T")[1].substring(0, 5));
+      const prices = data.map(item => item.NOK_per_kWh.toFixed(4));
+
+      return { labels, prices };
+    }
+
+    // Initialiser grafen med hentede data
+    async function createChart() {
+      const { labels, prices } = await fetchData();
+
+      const ctx = document.getElementById("myChart").getContext("2d");
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Strømpriser (NOK/kWh)',
+            data: prices,
+            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Pris (NOK/kWh)'
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Tidspunkt'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Kall funksjonen for å opprette grafen
+    createChart();
+  </script>
+</body>
+</html>

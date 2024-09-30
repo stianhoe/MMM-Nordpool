@@ -16,8 +16,8 @@ Module.register("MMM-Nordpool", {
   },
 
   getScripts: function () {
-    return ["modules/MMM-Nordpool/node_modules/chart.js/dist/chart.min.js"];
-  },
+    return ["modules/MMM-Nordpool/node_modules/chart.js/dist/chart.umd.js"];
+  },  
 
   getStyles: function () {
     return ["nordpool.css"];
