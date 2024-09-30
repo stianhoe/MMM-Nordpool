@@ -17,7 +17,7 @@ Module.register("MMM-Nordpool", {
 
   getScripts: function () {
     return ["modules/MMM-Nordpool/node_modules/chart.js/dist/chart.umd.js"];
-  },  
+  },
 
   getStyles: function () {
     return ["nordpool.css"];
@@ -30,13 +30,11 @@ Module.register("MMM-Nordpool", {
     wrapper.appendChild(canvas);
 
     if (!this.prices) {
-      wrapper.innerHTML = "<p>Laster strømpriser...</p>";
+      wrapper.innerHTML += "<p>Laster strømpriser...</p>";
     } else if (this.prices.error) {
       wrapper.innerHTML = `<p>Feil: ${this.prices.error}</p>`;
     } else if (this.prices.length === 0) {
       wrapper.innerHTML = "<p>Ingen strømpriser tilgjengelig.</p>";
-    } else {
-      this.renderGraph(canvas); // Tegn grafen når data er tilgjengelig
     }
 
     return wrapper;
@@ -57,7 +55,12 @@ Module.register("MMM-Nordpool", {
   socketNotificationReceived: function (notification, payload) {
     if (notification === "NORDPOOL_PRICES") {
       this.prices = payload;
-      this.updateDom();
+      console.log("MMM-Nordpool: Mottatte priser i socketNotificationReceived:", this.prices);
+      this.updateDom(); // Oppdaterer DOM-en først
+      const canvas = document.getElementById("nordpoolChart");
+      if (canvas) {
+        this.renderGraph(canvas); // Tegner grafen etter at DOM-en er oppdatert
+      }
     }
   },
 
@@ -65,20 +68,20 @@ Module.register("MMM-Nordpool", {
     if (this.chart) {
       this.chart.destroy();
     }
-  
-    const labels = this.prices.map(price => price.time); // Tidspunkter
-    const data = this.prices.map(price => parseFloat(price.price)); // Priser som tall
-  
+
+    const labels = this.prices.map(price => price.time || ""); // Tidspunkter
+    const data = this.prices.map(price => parseFloat(price.price) || 0); // Priser som tall
+
     this.chart = new Chart(canvas, {
-      type: "bar",
+      type: 'bar',
       data: {
         labels: labels,
         datasets: [
           {
             label: `Strømpriser (${this.config.displayCurrency})`,
             data: data,
-            backgroundColor: "rgba(54, 162, 235, 0.5)",
-            borderColor: "rgba(54, 162, 235, 1)",
+            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+            borderColor: 'rgba(54, 162, 235, 1)',
             borderWidth: 1
           }
         ]
@@ -101,5 +104,5 @@ Module.register("MMM-Nordpool", {
         }
       }
     });
-  }  
+  }
 });
