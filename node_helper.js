@@ -5,7 +5,7 @@ module.exports = NodeHelper.create({
   async socketNotificationReceived(notification, payload) {
     if (notification === "GET_NORDPOOL_PRICES") {
       try {
-        console.log("MMM-Nordpool: Henter priser fra Hva Koster Strømmen API...");
+        console.log("MMM-Nordpool: Generert API-URL er:", payload.apiUrl); // Skriv ut URL-en til konsollen
         const response = await fetch(payload.apiUrl);
         const data = await response.json();
         const prices = this.processPrices(data);
