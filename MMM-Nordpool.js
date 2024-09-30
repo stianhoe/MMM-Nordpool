@@ -47,10 +47,10 @@ Module.register("MMM-Nordpool", {
     const day = String(today.getDate()).padStart(2, '0'); // Legg til ledende null
     const formattedDate = `${year}/${month}-${day}`;
     const apiUrl = `${this.config.baseUrl}/${formattedDate}_${this.config.region}.json`;
-
-    console.log("MMM-Nordpool: Oppdaterer priser fra API med dynamisk URL:", apiUrl);
+  
+    console.log("MMM-Nordpool: Generert API-URL:", apiUrl); // Skriv ut API URL til konsollen
     this.sendSocketNotification("GET_NORDPOOL_PRICES", { apiUrl: apiUrl });
-  },
+  },  
 
   socketNotificationReceived: function (notification, payload) {
     if (notification === "NORDPOOL_PRICES") {
