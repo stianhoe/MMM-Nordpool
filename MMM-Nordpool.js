@@ -1,9 +1,9 @@
 Module.register("MMM-Nordpool", {
   defaults: {
-    apiUrl: "https://www.nordpoolgroup.com/api/marketdata/page/10?currency=,EUR,EUR,EUR",
+    baseUrl: "https://www.hvakosterstrommen.no/api/v1/prices",
     updateInterval: 60 * 60 * 1000, // Oppdatering hver time
-    displayCurrency: "NOK", // Endre til ønsket valuta
-    region: "Tr.heim" // Velg ønsket region (eks. "Oslo", "Kr.sand", "Bergen", osv.)
+    displayCurrency: "NOK",
+    region: "NO3" // Standard region
   },
 
   start: function () {
@@ -29,10 +29,9 @@ Module.register("MMM-Nordpool", {
     } else if (this.prices.length === 0) {
       wrapper.innerHTML = "<p>Ingen strømpriser tilgjengelig.</p>";
     } else {
-      // Bygg en enkel HTML-tabell med pris og tidspunkt
-      let table = "<table class='nordpool-prices'><tr><th>Tidspunkt</th><th>Pris (" + this.config.displayCurrency + ")</th></tr>";
+      let table = "<table class='nordpool-prices'><tr><th>Tidspunkt</th><th>Pris (NOK/kWh)</th></tr>";
       this.prices.forEach(price => {
-        table += `<tr><td>${price.hour}</td><td>${price.price}</td></tr>`;
+        table += `<tr><td>${price.time}</td><td>${price.price}</td></tr>`;
       });
       table += "</table>";
       wrapper.innerHTML = table;
@@ -42,12 +41,15 @@ Module.register("MMM-Nordpool", {
   },
 
   updatePrices: function () {
-    console.log("MMM-Nordpool: Oppdaterer priser fra API...");
-    this.sendSocketNotification("GET_NORDPOOL_PRICES", {
-      apiUrl: this.config.apiUrl,
-      region: this.config.region,
-      currency: this.config.displayCurrency
-    });
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Legg til ledende null
+    const day = String(today.getDate()).padStart(2, '0'); // Legg til ledende null
+    const formattedDate = `${year}/${month}-${day}`;
+    const apiUrl = `${this.config.baseUrl}/${formattedDate}_${this.config.region}.json`;
+
+    console.log("MMM-Nordpool: Oppdaterer priser fra API med dynamisk URL:", apiUrl);
+    this.sendSocketNotification("GET_NORDPOOL_PRICES", { apiUrl: apiUrl });
   },
 
   socketNotificationReceived: function (notification, payload) {
