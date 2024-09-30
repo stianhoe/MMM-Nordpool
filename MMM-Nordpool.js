@@ -67,7 +67,16 @@ Module.register("MMM-Nordpool", {
     }
   
     const labels = this.prices.map(price => price.time); // Tidspunkter
+    const currentHour = new Date().getHours(); // Finn nåværende time
     const data = this.prices.map(price => parseFloat(price.price)); // Priser som tall
+    
+    // Fargeinnstillinger basert på nåværende time
+    const backgroundColors = this.prices.map(price => {
+      const hour = parseInt(price.time.split(":")[0]);
+      if (hour < currentHour) return "rgba(100, 100, 100, 0.5)"; // Svakere farge for tidligere timer
+      if (hour === currentHour) return "rgba(255, 99, 132, 0.8)"; // Fremhev nåværende time
+      return "rgba(54, 162, 235, 0.5)"; // Normal farge for kommende timer
+    });
   
     this.chart = new Chart(canvas, {
       type: "bar",
@@ -75,15 +84,19 @@ Module.register("MMM-Nordpool", {
         labels: labels,
         datasets: [
           {
-            label: `Strømpriser (${this.config.displayCurrency})`,
             data: data,
-            backgroundColor: "rgba(54, 162, 235, 0.5)",
+            backgroundColor: backgroundColors,
             borderColor: "rgba(54, 162, 235, 1)",
             borderWidth: 1
           }
         ]
       },
       options: {
+        plugins: {
+          legend: {
+            display: false // Fjern legend
+          }
+        },
         scales: {
           y: {
             beginAtZero: true,
