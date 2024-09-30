@@ -72,7 +72,7 @@ Module.register("MMM-Nordpool", {
     const labels = this.prices.map(price => price.time); // Tidspunkter
     const currentHour = new Date().getHours(); // Nåværende time
     const data = this.prices.map(price => parseFloat(price.price)); // Priser som tall
-    
+  
     // Definer bakgrunns- og borderfarger basert på nåværende time
     const backgroundColors = this.prices.map(price => {
       const hour = parseInt(price.time.split(":")[0]);
@@ -105,15 +105,21 @@ Module.register("MMM-Nordpool", {
             enabled: true // Aktiver tooltips for å vise verdiene
           },
           datalabels: {
-            display: function (context) {
-              // Kun vis verdien over baren for nåværende time
-              return context.dataIndex === currentHour;
+            display: (context) => {
+              const hour = parseInt(labels[context.dataIndex].split(":")[0]);
+              return hour === currentHour; // Kun vis verdien for nåværende time
             },
-            align: 'end',
-            anchor: 'end',
+            color: 'black', // Farge på teksten over baren
+            font: {
+              weight: 'bold',
+              size: 14
+            },
             formatter: function (value) {
-              return value.toFixed(2); // Formater verdien
-            }
+              return `${value.toFixed(2)} NOK`; // Formater verdien
+            },
+            anchor: 'end',
+            align: 'start',
+            offset: -5 // Justering av posisjonen over baren
           }
         },
         scales: {
@@ -126,12 +132,12 @@ Module.register("MMM-Nordpool", {
           },
           x: {
             title: {
-              display: true,
+              display: false,
               text: "Tidspunkt"
             }
           }
         }
       }
     });
-  }  
+  }   
 });
