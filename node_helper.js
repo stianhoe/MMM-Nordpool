@@ -20,7 +20,7 @@ module.exports = NodeHelper.create({
   processPrices(data) {
     try {
       return data.map((item) => ({
-        time: item.time_start.split("T")[1].substring(0, 5), // Henter time:minute fra "time_start"
+        time: `${item.time_start.split("T")[0]} ${item.time_start.split("T")[1].substring(0, 5)}`, // Henter dato og tid: "yyyy-mm-dd hh:mm"
         price: item.NOK_per_kWh.toFixed(4) // Pris formatert til 4 desimaler
       }));
     } catch (e) {

@@ -97,24 +97,24 @@ Module.register("MMM-Nordpool", {
       this.chart.destroy();
     }
   
-    const labels = this.prices.map(price => {
-      if (!price.time) return "Ukjent dato";
-      const date = new Date(price.time);
-      const formattedDate = `${date.getDate()}.${date.getMonth() + 1}`;
-      const formattedTime = `${date.getHours().toString().padStart(2, '0')}:00`;
-      return `${formattedDate} ${formattedTime}`; // Inkluderer dato og tid i x-aksen
-    });
+    const labels = this.prices.map(price => price.time); // Bruker dato og tid som etiketter på x-aksen
     const currentHour = new Date().getHours(); // Nåværende time
     const data = this.prices.map(price => parseFloat(price.price)); // Priser som tall
   
     const backgroundColors = this.prices.map(price => {
-      const hour = new Date(price.time).getHours();
-      const isTomorrow = new Date(price.time).getDate() !== new Date().getDate();
-      if (isTomorrow) {
+      const priceDate = new Date(price.time);
+      const isToday = priceDate.getDate() === new Date().getDate();
+      const hour = priceDate.getHours();
+
+      if (!isToday) {
         return "rgba(54, 162, 235, 0.5)"; // Normal farge for morgendagens timer
       }
-      if (hour < currentHour) return "rgba(100, 100, 100, 0.5)"; // Svakere farge for tidligere timer
-      if (hour === currentHour) return "rgba(255, 99, 132, 0.8)"; // Fremhev nåværende time
+      if (hour < currentHour) {
+        return "rgba(100, 100, 100, 0.5)"; // Svakere farge for tidligere timer
+      }
+      if (hour === currentHour) {
+        return "rgba(255, 99, 132, 0.8)"; // Fremhev nåværende time
+      }
       return "rgba(54, 162, 235, 0.5)"; // Normal farge for kommende timer
     });
   
