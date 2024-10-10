@@ -32,7 +32,6 @@ Module.register("MMM-Nordpool", {
     wrapper.className = "nordpool-wrapper";
     wrapper.appendChild(canvas);
 
-
     if (!this.prices) {
       wrapper.innerHTML = "<p>Laster strømpriser...</p>";
     } else if (this.prices.error) {
@@ -50,60 +49,53 @@ Module.register("MMM-Nordpool", {
     const today = new Date();
     const currentHour = today.getHours();
 
-    let year, month, day;
-    let apiUrl;
+    let urls = [];
 
     if (currentHour < 13) {
-      // Hent gårsdagens og dagens priser
+      // Gårsdagens og dagens priser
       const yesterday = new Date(today);
       yesterday.setDate(today.getDate() - 1);
 
-      year = yesterday.getFullYear();
-      month = String(yesterday.getMonth() + 1).padStart(2, '0');
-      day = String(yesterday.getDate()).padStart(2, '0');
-      const formattedYesterday = `${year}/${month}-${day}`;
-
-      year = today.getFullYear();
-      month = String(today.getMonth() + 1).padStart(2, '0');
-      day = String(today.getDate()).padStart(2, '0');
-      const formattedToday = `${year}/${month}-${day}`;
-
-      apiUrl = [
-        `${this.config.baseUrl}/${formattedYesterday}_${this.config.region}.json`,
-        `${this.config.baseUrl}/${formattedToday}_${this.config.region}.json`
-      ];
+      urls.push(this.getFormattedUrl(yesterday));
+      urls.push(this.getFormattedUrl(today));
     } else {
-      // Hent dagens og morgendagens priser
+      // Dagens og morgendagens priser
       const tomorrow = new Date(today);
       tomorrow.setDate(today.getDate() + 1);
 
-      year = today.getFullYear();
-      month = String(today.getMonth() + 1).padStart(2, '0');
-      day = String(today.getDate()).padStart(2, '0');
-      const formattedToday = `${year}/${month}-${day}`;
-
-      year = tomorrow.getFullYear();
-      month = String(tomorrow.getMonth() + 1).padStart(2, '0');
-      day = String(tomorrow.getDate()).padStart(2, '0');
-      const formattedTomorrow = `${year}/${month}-${day}`;
-
-      apiUrl = [
-        `${this.config.baseUrl}/${formattedToday}_${this.config.region}.json`,
-        `${this.config.baseUrl}/${formattedTomorrow}_${this.config.region}.json`
-      ];
+      urls.push(this.getFormattedUrl(today));
+      urls.push(this.getFormattedUrl(tomorrow));
     }
 
-    console.log("MMM-Nordpool: Oppdaterer priser fra API med dynamisk URL:", apiUrl);
-    apiUrl.forEach(url => {
+    console.log("MMM-Nordpool: Oppdaterer priser fra API med følgende URLer:", urls);
+    urls.forEach(url => {
       this.sendSocketNotification("GET_NORDPOOL_PRICES", { apiUrl: url });
     });
-  }
-  ,
+  },
+
+  getFormattedUrl: function (date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${this.config.baseUrl}/${year}/${month}-${day}_${this.config.region}.json`;
+  },
 
   socketNotificationReceived: function (notification, payload) {
     if (notification === "NORDPOOL_PRICES") {
-      this.prices = payload;
-      this.updateDom();
+      if (!this.prices) {
+        this.prices = [];
+      }
+
+      if (payload.error) {
+        console.error("MMM-Nordpool: Feil ved henting av priser:", payload.error);
+      } else {
+        this.prices = this.prices.concat(payload); // Legg til prisene for dagen
+      }
+
+      // Oppdater DOM bare når alle forespørsler er ferdige
+      if (this.prices.length >= 48) { // Forventer 24 timer per dag, totalt 48 poster for to dager
+        this.updateDom();
+      }
     }
   },
 

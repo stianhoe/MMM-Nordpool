@@ -27,5 +27,5 @@ module.exports = NodeHelper.create({
       console.error("MMM-Nordpool: Feil ved prosessering av priser:", e);
       return { error: "Feil ved prosessering av data" };
     }
-  }  
+  }
 });
