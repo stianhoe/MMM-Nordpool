@@ -49,23 +49,7 @@ Module.register("MMM-Nordpool", {
     const today = new Date();
     const currentHour = today.getHours();
 
-    let urls = [];
-
-    if (currentHour < 13) {
-      // Gårsdagens og dagens priser
-      const yesterday = new Date(today);
-      yesterday.setDate(today.getDate() - 1);
-
-      urls.push(this.getFormattedUrl(yesterday));
-      urls.push(this.getFormattedUrl(today));
-    } else {
-      // Dagens og morgendagens priser
-      const tomorrow = new Date(today);
-      tomorrow.setDate(today.getDate() + 1);
-
-      urls.push(this.getFormattedUrl(today));
-      urls.push(this.getFormattedUrl(tomorrow));
-    }
+    let urls = [this.getFormattedUrl(today)];
 
     console.log("MMM-Nordpool: Oppdaterer priser fra API med følgende URLer:", urls);
     urls.forEach(url => {
@@ -89,11 +73,14 @@ Module.register("MMM-Nordpool", {
       if (payload.error) {
         console.error("MMM-Nordpool: Feil ved henting av priser:", payload.error);
       } else {
-        this.prices = this.prices.concat(payload); // Legg til prisene for dagen
+        // Sjekk om data fra URL allerede er hentet for å unngå duplikater
+        if (!this.prices.some(priceSet => priceSet.sourceUrl === payload.sourceUrl)) {
+          this.prices = this.prices.concat(payload.prices); // Legg til prisene for dagen
+        }
       }
 
       // Oppdater DOM bare når alle forespørsler er ferdige
-      if (this.prices.length >= 48) { // Forventer 24 timer per dag, totalt 48 poster for to dager
+      if (this.prices.length >= 24) { // Forventer 24 timer for dagen
         this.updateDom();
       }
     }
@@ -110,8 +97,12 @@ Module.register("MMM-Nordpool", {
 
     const backgroundColors = this.prices.map(price => {
       const hour = parseInt(price.time.split(":")[0]);
-      if (hour < currentHour) return "rgba(100, 100, 100, 0.5)"; // Svakere farge for tidligere timer
-      if (hour === currentHour) return "rgba(255, 99, 132, 0.8)"; // Fremhev nåværende time
+      if (hour < currentHour) {
+        return "rgba(100, 100, 100, 0.5)"; // Svakere farge for tidligere timer
+      }
+      if (hour === currentHour) {
+        return "rgba(255, 99, 132, 0.8)"; // Fremhev nåværende time
+      }
       return "rgba(54, 162, 235, 0.5)"; // Normal farge for kommende timer
     });
 
