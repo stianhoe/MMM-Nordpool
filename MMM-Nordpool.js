@@ -83,8 +83,8 @@ Module.register("MMM-Nordpool", {
       if (payload.error) {
         console.error("MMM-Nordpool: Feil ved henting av priser:", payload.error);
       } else {
-        // Kombiner dagens og morgendagens priser
-        this.prices = this.prices.concat(payload);
+        // Kombiner dagens og morgendagens priser, sørg for at dagens priser kommer først
+        this.prices = [...this.prices, ...payload].sort((a, b) => new Date(a.time_start) - new Date(b.time_start));
       }
 
       // Oppdater DOM når prisene er ferdig lastet
