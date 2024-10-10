@@ -84,7 +84,7 @@ Module.register("MMM-Nordpool", {
         console.error("MMM-Nordpool: Feil ved henting av priser:", payload.error);
       } else {
         // Kombiner dagens og morgendagens priser, sørg for at dagens priser kommer først
-        this.prices = [...this.prices, ...payload].sort((a, b) => new Date(a.time_start) - new Date(b.time_start));
+        this.prices = [...this.prices, ...payload].sort((a, b) => new Date(a.time) - new Date(b.time));
       }
 
       // Oppdater DOM når prisene er ferdig lastet
@@ -98,8 +98,8 @@ Module.register("MMM-Nordpool", {
     }
   
     const labels = this.prices.map(price => {
-      if (!price.time_start) return "Ukjent dato";
-      const date = new Date(price.time_start);
+      if (!price.time) return "Ukjent dato";
+      const date = new Date(price.time);
       const formattedDate = `${date.getDate()}.${date.getMonth() + 1}`;
       const formattedTime = `${date.getHours().toString().padStart(2, '0')}:00`;
       return `${formattedDate} ${formattedTime}`; // Inkluderer dato og tid i x-aksen
@@ -108,8 +108,8 @@ Module.register("MMM-Nordpool", {
     const data = this.prices.map(price => parseFloat(price.price)); // Priser som tall
   
     const backgroundColors = this.prices.map(price => {
-      const hour = new Date(price.time_start).getHours();
-      const isTomorrow = new Date(price.time_start).getDate() !== new Date().getDate();
+      const hour = new Date(price.time).getHours();
+      const isTomorrow = new Date(price.time).getDate() !== new Date().getDate();
       if (isTomorrow) {
         return "rgba(54, 162, 235, 0.5)"; // Normal farge for morgendagens timer
       }
