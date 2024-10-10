@@ -47,14 +47,12 @@ Module.register("MMM-Nordpool", {
 
   updatePrices: function () {
     const today = new Date();
-    const currentHour = today.getHours();
 
-    let urls = [this.getFormattedUrl(today)];
+    // Hent dagens priser
+    const url = this.getFormattedUrl(today);
 
-    console.log("MMM-Nordpool: Oppdaterer priser fra API med følgende URLer:", urls);
-    urls.forEach(url => {
-      this.sendSocketNotification("GET_NORDPOOL_PRICES", { apiUrl: url });
-    });
+    console.log("MMM-Nordpool: Oppdaterer priser fra API med URL:", url);
+    this.sendSocketNotification("GET_NORDPOOL_PRICES", { apiUrl: url });
   },
 
   getFormattedUrl: function (date) {
@@ -73,14 +71,12 @@ Module.register("MMM-Nordpool", {
       if (payload.error) {
         console.error("MMM-Nordpool: Feil ved henting av priser:", payload.error);
       } else {
-        // Sjekk om data fra URL allerede er hentet for å unngå duplikater
-        if (!this.prices.some(priceSet => priceSet.sourceUrl === payload.sourceUrl)) {
-          this.prices = this.prices.concat(payload.prices); // Legg til prisene for dagen
-        }
+        // Legg til dagens priser uten å sjekke for duplikater, da vi kun henter for én dag
+        this.prices = payload.prices;
       }
 
-      // Oppdater DOM bare når alle forespørsler er ferdige
-      if (this.prices.length >= 24) { // Forventer 24 timer for dagen
+      // Oppdater DOM når data er tilgjengelig
+      if (this.prices.length > 0) {
         this.updateDom();
       }
     }
