@@ -31,7 +31,7 @@ Module.register("MMM-Nordpool", {
     canvas.id = "nordpoolChart";
     wrapper.className = "nordpool-wrapper";
     wrapper.appendChild(canvas);
-
+  
     if (!this.prices) {
       wrapper.innerHTML = "<p>Laster strømpriser...</p>";
     } else if (this.prices.error) {
@@ -47,38 +47,20 @@ Module.register("MMM-Nordpool", {
 
   updatePrices: function () {
     const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Legg til ledende null
+    const day = String(today.getDate()).padStart(2, '0'); // Legg til ledende null
+    const formattedDate = `${year}/${month}-${day}`;
+    const apiUrl = `${this.config.baseUrl}/${formattedDate}_${this.config.region}.json`;
 
-    // Hent dagens priser
-    const url = this.getFormattedUrl(today);
-
-    console.log("MMM-Nordpool: Oppdaterer priser fra API med URL:", url);
-    this.sendSocketNotification("GET_NORDPOOL_PRICES", { apiUrl: url });
-  },
-
-  getFormattedUrl: function (date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${this.config.baseUrl}/${year}/${month}-${day}_${this.config.region}.json`;
+    console.log("MMM-Nordpool: Oppdaterer priser fra API med dynamisk URL:", apiUrl);
+    this.sendSocketNotification("GET_NORDPOOL_PRICES", { apiUrl: apiUrl });
   },
 
   socketNotificationReceived: function (notification, payload) {
     if (notification === "NORDPOOL_PRICES") {
-      if (!this.prices) {
-        this.prices = [];
-      }
-
-      if (payload.error) {
-        console.error("MMM-Nordpool: Feil ved henting av priser:", payload.error);
-      } else {
-        // Legg til dagens priser uten å sjekke for duplikater, da vi kun henter for én dag
-        this.prices = payload.prices;
-      }
-
-      // Oppdater DOM når data er tilgjengelig
-      if (this.prices.length > 0) {
-        this.updateDom();
-      }
+      this.prices = payload;
+      this.updateDom();
     }
   },
 
@@ -86,24 +68,20 @@ Module.register("MMM-Nordpool", {
     if (this.chart) {
       this.chart.destroy();
     }
-
+  
     const labels = this.prices.map(price => price.time); // Tidspunkter
     const currentHour = new Date().getHours(); // Nåværende time
     const data = this.prices.map(price => parseFloat(price.price)); // Priser som tall
-
+  
     const backgroundColors = this.prices.map(price => {
       const hour = parseInt(price.time.split(":")[0]);
-      if (hour < currentHour) {
-        return "rgba(100, 100, 100, 0.5)"; // Svakere farge for tidligere timer
-      }
-      if (hour === currentHour) {
-        return "rgba(255, 99, 132, 0.8)"; // Fremhev nåværende time
-      }
+      if (hour < currentHour) return "rgba(100, 100, 100, 0.5)"; // Svakere farge for tidligere timer
+      if (hour === currentHour) return "rgba(255, 99, 132, 0.8)"; // Fremhev nåværende time
       return "rgba(54, 162, 235, 0.5)"; // Normal farge for kommende timer
     });
-
+  
     const borderColors = backgroundColors; // Border-fargen matcher bar-fargen
-
+  
     this.chart = new Chart(canvas, {
       type: "bar",
       data: {
@@ -142,5 +120,5 @@ Module.register("MMM-Nordpool", {
         }
       }
     });
-  }
+  }  
 });
