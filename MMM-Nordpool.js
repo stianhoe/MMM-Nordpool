@@ -47,19 +47,47 @@ Module.register("MMM-Nordpool", {
 
   updatePrices: function () {
     const today = new Date();
+    const currentHour = today.getHours();
+    const urls = [];
+
+    // Hent dagens priser
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, '0'); // Legg til ledende null
     const day = String(today.getDate()).padStart(2, '0'); // Legg til ledende null
-    const formattedDate = `${year}/${month}-${day}`;
-    const apiUrl = `${this.config.baseUrl}/${formattedDate}_${this.config.region}.json`;
+    const todayFormattedDate = `${year}/${month}-${day}`;
+    urls.push(`${this.config.baseUrl}/${todayFormattedDate}_${this.config.region}.json`);
 
-    console.log("MMM-Nordpool: Oppdaterer priser fra API med dynamisk URL:", apiUrl);
-    this.sendSocketNotification("GET_NORDPOOL_PRICES", { apiUrl: apiUrl });
+    if (currentHour >= 13) {
+      // Etter kl 13:00, hent også morgendagens priser
+      const tomorrow = new Date();
+      tomorrow.setDate(today.getDate() + 1);
+      const year = tomorrow.getFullYear();
+      const month = String(tomorrow.getMonth() + 1).padStart(2, '0'); // Legg til ledende null
+      const day = String(tomorrow.getDate()).padStart(2, '0'); // Legg til ledende null
+      const tomorrowFormattedDate = `${year}/${month}-${day}`;
+      urls.push(`${this.config.baseUrl}/${tomorrowFormattedDate}_${this.config.region}.json`);
+    }
+
+    console.log("MMM-Nordpool: Oppdaterer priser fra API med følgende URLer:", urls);
+    urls.forEach(url => {
+      this.sendSocketNotification("GET_NORDPOOL_PRICES", { apiUrl: url });
+    });
   },
 
   socketNotificationReceived: function (notification, payload) {
     if (notification === "NORDPOOL_PRICES") {
-      this.prices = payload;
+      if (!this.prices) {
+        this.prices = [];
+      }
+
+      if (payload.error) {
+        console.error("MMM-Nordpool: Feil ved henting av priser:", payload.error);
+      } else {
+        // Kombiner dagens og morgendagens priser
+        this.prices = this.prices.concat(payload);
+      }
+
+      // Oppdater DOM når prisene er ferdig lastet
       this.updateDom();
     }
   },
