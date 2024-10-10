@@ -101,13 +101,14 @@ Module.register("MMM-Nordpool", {
       if (!price.time_start) return "Ukjent dato";
       const date = new Date(price.time_start);
       const formattedDate = `${date.getDate()}.${date.getMonth() + 1}`;
-      return `${formattedDate} ${price.time}`; // Inkluderer dato og tid i x-aksen
+      const formattedTime = `${date.getHours().toString().padStart(2, '0')}:00`;
+      return `${formattedDate} ${formattedTime}`; // Inkluderer dato og tid i x-aksen
     });
     const currentHour = new Date().getHours(); // Nåværende time
-    const data = this.prices.map(price => parseFloat(price.price)); // Priser som tall
+    const data = this.prices.map(price => parseFloat(price.NOK_per_kWh)); // Priser som tall
   
     const backgroundColors = this.prices.map(price => {
-      const hour = parseInt(price.time.split(":")[0]);
+      const hour = new Date(price.time_start).getHours();
       const isTomorrow = new Date(price.time_start).getDate() !== new Date().getDate();
       if (isTomorrow) {
         return "rgba(54, 162, 235, 0.5)"; // Normal farge for morgendagens timer
