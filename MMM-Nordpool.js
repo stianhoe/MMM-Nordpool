@@ -98,6 +98,7 @@ Module.register("MMM-Nordpool", {
     }
   
     const labels = this.prices.map(price => {
+      if (!price.time_start) return "Ukjent dato";
       const date = new Date(price.time_start);
       const formattedDate = `${date.getDate()}.${date.getMonth() + 1}`;
       return `${formattedDate} ${price.time}`; // Inkluderer dato og tid i x-aksen
