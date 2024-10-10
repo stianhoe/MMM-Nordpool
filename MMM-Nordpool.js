@@ -105,7 +105,7 @@ Module.register("MMM-Nordpool", {
       return `${formattedDate} ${formattedTime}`; // Inkluderer dato og tid i x-aksen
     });
     const currentHour = new Date().getHours(); // Nåværende time
-    const data = this.prices.map(price => parseFloat(price.NOK_per_kWh)); // Priser som tall
+    const data = this.prices.map(price => parseFloat(price.price)); // Priser som tall
   
     const backgroundColors = this.prices.map(price => {
       const hour = new Date(price.time_start).getHours();
