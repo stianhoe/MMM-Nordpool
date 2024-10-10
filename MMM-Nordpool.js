@@ -103,6 +103,9 @@ Module.register("MMM-Nordpool", {
   
     const backgroundColors = this.prices.map(price => {
       const hour = parseInt(price.time.split(":")[0]);
+      if (price.date === "tomorrow") {
+        return "rgba(54, 162, 235, 0.5)"; // Normal farge for morgendagens timer
+      }
       if (hour < currentHour) return "rgba(100, 100, 100, 0.5)"; // Svakere farge for tidligere timer
       if (hour === currentHour) return "rgba(255, 99, 132, 0.8)"; // Fremhev nåværende time
       return "rgba(54, 162, 235, 0.5)"; // Normal farge for kommende timer
