@@ -98,7 +98,10 @@ Module.register("MMM-Nordpool", {
       this.chart.destroy();
     }
   
-    const labels = this.prices.map(price => price.time); // Bruker dato og tid som etiketter på x-aksen
+    const labels = this.prices.map(price => {
+      const time = price.time.split(' ')[1]; // Bruker kun tid som etikett på x-aksen
+      return time;
+    });
     const currentHour = new Date().getHours(); // Nåværende time
     const data = this.prices.map(price => parseFloat(price.price)); // Priser som tall
   
@@ -154,7 +157,7 @@ Module.register("MMM-Nordpool", {
           x: {
             title: {
               display: true,
-              text: "Dato og Tid"
+              text: "Tid"
             }
           }
         }
