@@ -97,7 +97,11 @@ Module.register("MMM-Nordpool", {
       this.chart.destroy();
     }
   
-    const labels = this.prices.map(price => price.time); // Tidspunkter
+    const labels = this.prices.map(price => {
+      const date = new Date(price.time_start);
+      const formattedDate = `${date.getDate()}.${date.getMonth() + 1}`;
+      return `${formattedDate} ${price.time}`; // Inkluderer dato og tid i x-aksen
+    });
     const currentHour = new Date().getHours(); // Nåværende time
     const data = this.prices.map(price => parseFloat(price.price)); // Priser som tall
   
@@ -146,7 +150,8 @@ Module.register("MMM-Nordpool", {
           },
           x: {
             title: {
-              display: false
+              display: true,
+              text: "Dato og Tid"
             }
           }
         }
